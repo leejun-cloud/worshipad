@@ -1,0 +1,25 @@
+{
+  "churchName": "우리교회",
+  "slogan": "함께 예배하고 함께 살아가는 공동체",
+  "pastorName": "홍길동",
+  "pastorTitle": "담임목사",
+  "address": "서울특별시 강남구 테헤란로 123 OO빌딩 5층",
+  "transit": "지하철 2호선 OO역 3번 출구 도보 5분",
+  "phone": "02-123-4567",
+  "website": "https://ourchurch.kr",
+  "socials": ["@ourchurch_official", "youtube.com/@ourchurch"],
+  "accentColor": "#d4a657",
+  "backgroundColor": "#0f1c2e",
+  "services": [
+    { "name": "주일 1부 예배", "schedule": "주일 오전 9:00", "place": "본당" },
+    { "name": "주일 2부 예배", "schedule": "주일 오전 11:00", "place": "본당" },
+    { "name": "수요 예배",     "schedule": "수요일 저녁 7:30", "place": "본당" },
+    { "name": "금요 기도회",   "schedule": "금요일 저녁 8:00", "place": "기도실" }
+  ],
+  "programs": [
+    { "title": "청년부 모임",   "description": "20-30대 청년들의 신앙 공동체",  "schedule": "금 저녁 7:30" },
+    { "title": "어린이 주일학교","description": "아이들이 즐겁게 만나는 예수님",  "schedule": "주일 9:00" },
+    { "title": "새가족 교실",   "description": "처음 오신 분을 위한 안내",       "schedule": "주일 1:00" },
+    { "title": "셀모임",         "description": "소그룹으로 삶을 나누는 시간",   "schedule": "주중 저녁" }
+  ]
+}
