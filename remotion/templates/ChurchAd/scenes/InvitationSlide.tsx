@@ -10,6 +10,7 @@ import {
   TextCard,
   type BaseSlideProps,
   renderText,
+  KineticText,
 } from './_shared';
 
 interface Props extends BaseSlideProps {
@@ -34,6 +35,9 @@ export const InvitationSlide: React.FC<Props> = ({
   entryEffect,
   badge,
   textScale,
+  motionIntensity,
+  bgOverlayOpacity,
+  ...rest
 }) => {
   const s = heroScale(textScale);
   const frame = useCurrentFrame();
@@ -48,7 +52,7 @@ export const InvitationSlide: React.FC<Props> = ({
   if (mediaDataUri && layout === 'full-bleed') {
     return (
       <AbsoluteFill>
-        <Background mediaDataUri={mediaDataUri} mediaType={mediaType} backgroundColor={backgroundColor} accentColor={accentColor} slideIndex={slideIndex} entryEffect={entryEffect} slideType="invitation" photoShowcase />
+        <Background {...rest} mediaDataUri={mediaDataUri} mediaType={mediaType} backgroundColor={backgroundColor} accentColor={accentColor} slideIndex={slideIndex} entryEffect={entryEffect} slideType="invitation" photoShowcase motionIntensity={motionIntensity} bgOverlayOpacity={bgOverlayOpacity} />
         <FullBleedOverlay heading={heading} subheading={cta || subheading} accentColor={accentColor} />
         <ChurchBadge churchName={churchName} accentColor={accentColor} logoDataUri={logoDataUri} badge={badge} />
       </AbsoluteFill>
@@ -57,7 +61,7 @@ export const InvitationSlide: React.FC<Props> = ({
   if (mediaDataUri && layout === 'immersive') {
     return (
       <AbsoluteFill>
-        <Background mediaDataUri={mediaDataUri} mediaType={mediaType} backgroundColor={backgroundColor} accentColor={accentColor} slideIndex={slideIndex} entryEffect={entryEffect} slideType="invitation" photoShowcase />
+        <Background {...rest} mediaDataUri={mediaDataUri} mediaType={mediaType} backgroundColor={backgroundColor} accentColor={accentColor} slideIndex={slideIndex} entryEffect={entryEffect} slideType="invitation" photoShowcase motionIntensity={motionIntensity} bgOverlayOpacity={bgOverlayOpacity} />
         <ImmersiveOverlay heading={heading} subheading={cta || subheading} accentColor={accentColor} />
         <ChurchBadge churchName={churchName} accentColor={accentColor} logoDataUri={logoDataUri} badge={badge} />
       </AbsoluteFill>
@@ -81,17 +85,19 @@ export const InvitationSlide: React.FC<Props> = ({
         : 'center';
     return (
       <AbsoluteFill>
-        <Background
+        <Background {...rest}
           mediaDataUri={mediaDataUri}
           mediaType={mediaType}
           backgroundColor={backgroundColor}
           accentColor={accentColor}
           slideIndex={slideIndex}
-        entryEffect={entryEffect}
-        slideType="invitation"
+          entryEffect={entryEffect}
+          slideType="invitation"
           photoShowcase
+          motionIntensity={motionIntensity}
+          bgOverlayOpacity={bgOverlayOpacity}
         />
-        <TextCard accentColor={accentColor} placement={placement as any} padding={48}>
+        <TextCard {...rest} accentColor={accentColor} placement={placement as any} padding={48}>
           <div
             style={{
               textAlign: 'center',
@@ -109,8 +115,12 @@ export const InvitationSlide: React.FC<Props> = ({
             >
               ✟
             </div>
-            <div
+            <KineticText
+              text={heading}
+              startFrame={6}
+              accentColor={accentColor}
               style={{
+                display: 'block',
                 fontFamily: fontStack,
                 fontWeight: 900,
                 fontSize: 110 * s,
@@ -119,9 +129,7 @@ export const InvitationSlide: React.FC<Props> = ({
                 letterSpacing: '-0.03em',
                 marginBottom: 22,
               }}
-            >
-              {renderText(heading)}
-            </div>
+            />
             {subheading && (
               <div
                 style={{
@@ -165,7 +173,7 @@ export const InvitationSlide: React.FC<Props> = ({
 
   return (
     <AbsoluteFill>
-      <Background
+      <Background {...rest}
         mediaDataUri={mediaDataUri}
         mediaType={mediaType}
         backgroundColor={backgroundColor}
@@ -175,6 +183,8 @@ export const InvitationSlide: React.FC<Props> = ({
         entryEffect={entryEffect}
         slideType="invitation"
         scrim="center"
+        motionIntensity={motionIntensity}
+        bgOverlayOpacity={bgOverlayOpacity}
       />
       <AbsoluteFill
         style={{
@@ -184,10 +194,12 @@ export const InvitationSlide: React.FC<Props> = ({
           padding: '0 120px',
         }}
       >
-        <div
+        <KineticText
+          text={heading}
+          startFrame={6}
+          accentColor={accentColor}
           style={{
-            opacity: headOp,
-            transform: `translateY(${headY}px)`,
+            display: 'block',
             fontFamily: fontStack,
             fontWeight: 900,
             fontSize: 216 * s,
@@ -197,9 +209,7 @@ export const InvitationSlide: React.FC<Props> = ({
             marginBottom: 32,
             textShadow: heavyTextShadow,
           }}
-        >
-          {renderText(heading)}
-        </div>
+        />
         <div
           style={{
             width: lineWidth,

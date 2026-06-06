@@ -1,6 +1,8 @@
 import { AbsoluteFill, interpolate, useCurrentFrame } from 'remotion';
 import { Background, ChurchBadge, fontStack, TextCard, type BaseSlideProps ,
   renderText,
+  KineticText,
+  heroScale,
 } from './_shared';
 
 interface Props extends BaseSlideProps {
@@ -26,7 +28,12 @@ export const ContactSlide: React.FC<Props> = ({
   slideIndex,
   entryEffect,
   badge,
+  motionIntensity,
+  bgOverlayOpacity,
+  textScale,
+  ...rest
 }) => {
+  const s = heroScale(textScale);
   const frame = useCurrentFrame();
   const op = interpolate(frame, [4, 26], [0, 1], { extrapolateRight: 'clamp' });
   const items = [
@@ -43,7 +50,7 @@ export const ContactSlide: React.FC<Props> = ({
     const placement = layout === 'photo-card-side' ? 'side-right' : layout === 'photo-card' ? 'center' : 'bottom';
     return (
       <AbsoluteFill>
-        <Background
+        <Background {...rest}
           mediaDataUri={mediaDataUri}
           mediaType={mediaType}
           backgroundColor={backgroundColor}
@@ -52,12 +59,24 @@ export const ContactSlide: React.FC<Props> = ({
           entryEffect={entryEffect}
           slideType="contact"
           photoShowcase
+          motionIntensity={motionIntensity}
+          bgOverlayOpacity={bgOverlayOpacity}
         />
-        <TextCard accentColor={accentColor} placement={placement as any} padding={44}>
-          <div style={{ opacity: op, display: 'flex', alignItems: 'baseline', gap: 18, marginBottom: 24 }}>
-            <div style={{ fontFamily: fontStack, fontWeight: 900, fontSize: 82, color: '#fff', letterSpacing: '-0.025em' }}>
-              {renderText(heading)}
-            </div>
+        <TextCard {...rest} accentColor={accentColor} placement={placement as any} padding={44}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 18, marginBottom: 24 }}>
+            <KineticText
+              text={heading}
+              startFrame={6}
+              accentColor={accentColor}
+              style={{
+                display: 'block',
+                fontFamily: fontStack,
+                fontWeight: 900,
+                fontSize: 82 * s,
+                color: '#fff',
+                letterSpacing: '-0.025em',
+              }}
+            />
             <div style={{ width: 80, height: 4, background: accentColor, borderRadius: 2 }} />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -66,8 +85,8 @@ export const ContactSlide: React.FC<Props> = ({
               const o = interpolate(frame, [d, d + 16], [0, 1], { extrapolateRight: 'clamp' });
               return (
                 <div key={i} style={{ opacity: o, display: 'flex', alignItems: 'center', gap: 16 }}>
-                  <div style={{ fontSize: 38, color: accentColor }}>{it.icon}</div>
-                  <div style={{ fontFamily: fontStack, fontWeight: 650, fontSize: 38, color: '#fff' }}>
+                  <div style={{ fontSize: 38 * s, color: accentColor }}>{it.icon}</div>
+                  <div style={{ fontFamily: fontStack, fontWeight: 650, fontSize: 38 * s, color: '#fff' }}>
                     {it.label}
                   </div>
                 </div>
@@ -82,7 +101,7 @@ export const ContactSlide: React.FC<Props> = ({
 
   return (
     <AbsoluteFill>
-      <Background
+      <Background {...rest}
         mediaDataUri={mediaDataUri}
         mediaType={mediaType}
         backgroundColor={backgroundColor}
@@ -93,6 +112,8 @@ export const ContactSlide: React.FC<Props> = ({
         entryEffect={entryEffect}
         slideType="contact"
         scrim={alignRight ? 'right' : 'left'}
+        motionIntensity={motionIntensity}
+        bgOverlayOpacity={bgOverlayOpacity}
       />
       <AbsoluteFill
         style={{
@@ -104,7 +125,6 @@ export const ContactSlide: React.FC<Props> = ({
       >
         <div
           style={{
-            opacity: op,
             display: 'flex',
             alignItems: 'baseline',
             flexDirection: alignRight ? 'row-reverse' : 'row',
@@ -112,17 +132,19 @@ export const ContactSlide: React.FC<Props> = ({
             marginBottom: 56,
           }}
         >
-          <div
+          <KineticText
+            text={heading}
+            startFrame={6}
+            accentColor={accentColor}
             style={{
+              display: 'block',
               fontFamily: fontStack,
               fontWeight: 900,
-              fontSize: 152,
+              fontSize: 152 * s,
               color: '#fff',
               letterSpacing: '-0.025em',
             }}
-          >
-            {renderText(heading)}
-          </div>
+          />
           <div style={{ width: 100, height: 4, background: accentColor, borderRadius: 2 }} />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 26, maxWidth: 1500 }}>
@@ -146,12 +168,12 @@ export const ContactSlide: React.FC<Props> = ({
                   padding: '20px 32px',
                 }}
               >
-                <div style={{ fontSize: 64, color: accentColor }}>{it.icon}</div>
+                <div style={{ fontSize: 64 * s, color: accentColor }}>{it.icon}</div>
                 <div
                   style={{
                     fontFamily: fontStack,
                     fontWeight: 600,
-                    fontSize: 64,
+                    fontSize: 64 * s,
                     color: '#fff',
                   }}
                 >

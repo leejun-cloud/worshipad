@@ -193,7 +193,9 @@ export const Timeline: React.FC<Props> = ({
               }}
               onDragEnd={() => {
                 if (dragFrom !== null && dragOver !== null && dragFrom !== dragOver) {
-                  onReorder(dragFrom, dragOver);
+                  const fromLocked = slides[dragFrom]?.locked;
+                  const toLocked = slides[dragOver]?.locked;
+                  if (!fromLocked && !toLocked) onReorder(dragFrom, dragOver);
                 }
                 setDragFrom(null);
                 setDragOver(null);

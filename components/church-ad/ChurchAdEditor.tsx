@@ -130,6 +130,18 @@ export const ChurchAdEditor: React.FC = () => {
     } catch {}
   }, [mode]);
 
+  useEffect(() => {
+    const onEditSlide = () => {
+      const el = document.getElementById('heading-input');
+      if (el) {
+        el.focus();
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    };
+    window.addEventListener('editor-edit-slide', onEditSlide as EventListener);
+    return () => window.removeEventListener('editor-edit-slide', onEditSlide as EventListener);
+  }, []);
+
   // Load from localStorage on mount
   useEffect(() => {
     try {
@@ -271,8 +283,11 @@ export const ChurchAdEditor: React.FC = () => {
   };
 
   const addSlide = (type: ChurchSlideType) => {
-    setProject((p) => ({ ...p, slides: [...p.slides, newSlide(type)] }));
-    setSelected(project.slides.length);
+    setProject((p) => {
+      const next = [...p.slides, newSlide(type)];
+      setSelected(next.length - 1);
+      return { ...p, slides: next };
+    });
   };
 
   const generateFromText = async (opts: { autoPipeline?: boolean } = { autoPipeline: true }) => {

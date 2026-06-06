@@ -98,6 +98,11 @@ export interface ChurchAdSlide {
 
   // hero text size multiplier (1.0 default)
   textScale?: number;
+  cardScale?: number;
+  bgOverlayOpacity?: number;
+  imageScale?: number;
+  imageX?: number;
+  imageY?: number;
   entryEffect?:
     | 'none'
     | 'fade'
@@ -116,6 +121,7 @@ export interface ChurchAdSlide {
   mediaUrl?: string;
   mediaDataUri?: string;
   mediaType?: 'image' | 'video';
+  isStock?: boolean;
   durationSec?: number;
 }
 

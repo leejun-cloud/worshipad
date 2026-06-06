@@ -21,20 +21,23 @@ export const pickMotion = (slideIndex: number): MotionVariant =>
  * All variants keep scale(1.06) constant — no zoom pulsing — so motion
  * reads as a smooth camera glide rather than a breathing effect.
  */
-export const motionTransform = (variant: MotionVariant, progress: number): string => {
+export const motionTransform = (variant: MotionVariant, progress: number, intensity = 1.0): string => {
+  const baseScale = 1.0 + 0.06 * intensity;
+  const translationRange = 3 * intensity;
+  const diagTranslation = 2 * intensity;
   switch (variant) {
     case 'pan-left':
-      return `scale(1.06) translateX(${3 - 6 * progress}%)`;
+      return `scale(${baseScale}) translateX(${translationRange - (translationRange * 2) * progress}%)`;
     case 'pan-right':
-      return `scale(1.06) translateX(${-3 + 6 * progress}%)`;
+      return `scale(${baseScale}) translateX(${-translationRange + (translationRange * 2) * progress}%)`;
     case 'pan-up':
-      return `scale(1.06) translateY(${3 - 6 * progress}%)`;
+      return `scale(${baseScale}) translateY(${translationRange - (translationRange * 2) * progress}%)`;
     case 'pan-down':
-      return `scale(1.06) translateY(${-3 + 6 * progress}%)`;
+      return `scale(${baseScale}) translateY(${-translationRange + (translationRange * 2) * progress}%)`;
     case 'drift-diagonal':
-      return `scale(1.06) translate(${-2 + 4 * progress}%, ${2 - 4 * progress}%)`;
+      return `scale(${baseScale}) translate(${-diagTranslation + (diagTranslation * 2) * progress}%, ${diagTranslation - (diagTranslation * 2) * progress}%)`;
     case 'still':
-      return 'scale(1.04)';
+      return `scale(${1.0 + 0.04 * intensity})`;
   }
 };
 

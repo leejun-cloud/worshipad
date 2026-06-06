@@ -1,6 +1,8 @@
 import { AbsoluteFill, Img, Video, interpolate, useCurrentFrame } from 'remotion';
 import { ChurchBadge, fontStack, type BaseSlideProps ,
   renderText,
+  KineticText,
+  heroScale,
 } from './_shared';
 
 interface Props extends BaseSlideProps {
@@ -22,10 +24,16 @@ export const PastorSlide: React.FC<Props> = ({
   badge,
   mediaDataUri,
   mediaType = 'image',
+  motionIntensity = 1.0,
+  textScale,
+  imageScale = 1.0,
+  imageX = 0,
+  imageY = 0,
 }) => {
+  const s = heroScale(textScale);
   const frame = useCurrentFrame();
   const op = interpolate(frame, [4, 26], [0, 1], { extrapolateRight: 'clamp' });
-  const scale = interpolate(frame, [0, 220], [1.0, 1.06], { extrapolateRight: 'clamp' });
+  const scale = interpolate(frame, [0, 220], [1.0, 1.0 + 0.06 * motionIntensity], { extrapolateRight: 'clamp' });
 
   return (
     <AbsoluteFill style={{ background: backgroundColor }}>
@@ -40,7 +48,7 @@ export const PastorSlide: React.FC<Props> = ({
                 width: '100%',
                 height: '100%',
                 objectFit: 'cover',
-                transform: `scale(${scale})`,
+                transform: `scale(${scale}) translate(${imageX}px, ${imageY}px) scale(${imageScale})`,
               }}
             />
           ) : mediaDataUri ? (
@@ -50,7 +58,7 @@ export const PastorSlide: React.FC<Props> = ({
                 width: '100%',
                 height: '100%',
                 objectFit: 'cover',
-                transform: `scale(${scale})`,
+                transform: `scale(${scale}) translate(${imageX}px, ${imageY}px) scale(${imageScale})`,
               }}
             />
           ) : (
@@ -80,24 +88,26 @@ export const PastorSlide: React.FC<Props> = ({
             opacity: op,
           }}
         >
-          <div
+          <KineticText
+            text={heading}
+            startFrame={4}
+            accentColor={accentColor}
             style={{
+              display: 'block',
               fontFamily: fontStack,
               fontWeight: 700,
-              fontSize: 48,
+              fontSize: 48 * s,
               color: accentColor,
               letterSpacing: '0.04em',
               marginBottom: 18,
             }}
-          >
-            {renderText(heading)}
-          </div>
+          />
           {pastorName && (
             <div
               style={{
                 fontFamily: fontStack,
                 fontWeight: 900,
-                fontSize: 144,
+                fontSize: 144 * s,
                 color: '#fff',
                 lineHeight: 1.05,
                 letterSpacing: '-0.025em',
@@ -112,7 +122,7 @@ export const PastorSlide: React.FC<Props> = ({
               style={{
                 fontFamily: fontStack,
                 fontWeight: 400,
-                fontSize: 52,
+                fontSize: 52 * s,
                 color: 'rgba(255,255,255,0.6)',
                 marginBottom: 32,
               }}
@@ -126,7 +136,7 @@ export const PastorSlide: React.FC<Props> = ({
               style={{
                 fontFamily: fontStack,
                 fontWeight: 400,
-                fontSize: 52,
+                fontSize: 52 * s,
                 color: 'rgba(255,255,255,0.82)',
                 lineHeight: 1.5,
                 fontStyle: 'italic',

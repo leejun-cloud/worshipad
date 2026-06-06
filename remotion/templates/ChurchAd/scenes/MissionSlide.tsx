@@ -10,6 +10,7 @@ import {
   TextCard,
   type BaseSlideProps,
   renderText,
+  KineticText,
 } from './_shared';
 
 interface Props extends BaseSlideProps {
@@ -44,6 +45,9 @@ export const MissionSlide: React.FC<Props> = ({
   slideIndex,
   entryEffect,
   textScale,
+  motionIntensity,
+  bgOverlayOpacity,
+  ...rest
 }) => {
   const s = heroScale(textScale);
   const frame = useCurrentFrame();
@@ -54,7 +58,7 @@ export const MissionSlide: React.FC<Props> = ({
   if (mediaDataUri && layout === 'full-bleed') {
     return (
       <AbsoluteFill>
-        <Background mediaDataUri={mediaDataUri} mediaType={mediaType} backgroundColor={backgroundColor} accentColor={accentColor} slideIndex={slideIndex} entryEffect={entryEffect} slideType="mission" photoShowcase />
+        <Background {...rest} mediaDataUri={mediaDataUri} mediaType={mediaType} backgroundColor={backgroundColor} accentColor={accentColor} slideIndex={slideIndex} entryEffect={entryEffect} slideType="mission" photoShowcase motionIntensity={motionIntensity} bgOverlayOpacity={bgOverlayOpacity} />
         <FullBleedOverlay heading={mission} subheading={verseRef || heading} accentColor={accentColor} />
         <ChurchBadge churchName={churchName} accentColor={accentColor} logoDataUri={logoDataUri} badge={badge} />
       </AbsoluteFill>
@@ -63,14 +67,14 @@ export const MissionSlide: React.FC<Props> = ({
   if (mediaDataUri && layout === 'immersive') {
     return (
       <AbsoluteFill>
-        <Background mediaDataUri={mediaDataUri} mediaType={mediaType} backgroundColor={backgroundColor} accentColor={accentColor} slideIndex={slideIndex} entryEffect={entryEffect} slideType="mission" photoShowcase />
+        <Background {...rest} mediaDataUri={mediaDataUri} mediaType={mediaType} backgroundColor={backgroundColor} accentColor={accentColor} slideIndex={slideIndex} entryEffect={entryEffect} slideType="mission" photoShowcase motionIntensity={motionIntensity} bgOverlayOpacity={bgOverlayOpacity} />
         <ImmersiveOverlay heading={heading} subheading={mission} accentColor={accentColor} />
         <ChurchBadge churchName={churchName} accentColor={accentColor} logoDataUri={logoDataUri} badge={badge} />
       </AbsoluteFill>
     );
   }
 
-  // ── photo-card layouts — image #19 패턴 (말씀 묵상 인용구) ──
+  // ── photo-card layouts — image #19 패턴 ──
   const isCardLayout =
     !!mediaDataUri &&
     (layout === 'photo-card' ||
@@ -82,15 +86,17 @@ export const MissionSlide: React.FC<Props> = ({
     const placement = layout === 'photo-card-top' ? 'bottom' : 'bottom';
     return (
       <AbsoluteFill>
-        <Background
+        <Background {...rest}
           mediaDataUri={mediaDataUri}
           mediaType={mediaType}
           backgroundColor={backgroundColor}
           accentColor={accentColor}
           slideIndex={slideIndex}
-        entryEffect={entryEffect}
-        slideType="mission"
+          entryEffect={entryEffect}
+          slideType="mission"
           photoShowcase
+          motionIntensity={motionIntensity}
+          bgOverlayOpacity={bgOverlayOpacity}
         />
         {/* Header on top of photo */}
         <div
@@ -118,14 +124,13 @@ export const MissionSlide: React.FC<Props> = ({
               textShadow: heavyTextShadow,
             }}
           >
-            📖 {renderText(heading)}
+            📖 <KineticText text={heading} startFrame={6} accentColor={accentColor} />
           </div>
         </div>
         {/* Big quote card at bottom */}
-        <TextCard accentColor={accentColor} placement={placement as any} padding={48}>
+        <TextCard {...rest} accentColor={accentColor} placement={placement as any} padding={48}>
           <div
             style={{
-              opacity: missionOp,
               transform: `scale(${missionScale})`,
               fontFamily: fontStack,
               fontWeight: 800,
@@ -137,7 +142,7 @@ export const MissionSlide: React.FC<Props> = ({
             }}
           >
             <span style={{ color: accentColor, fontSize: 48 * s, marginRight: 10 }}>"</span>
-            {mission}
+            <KineticText text={mission} startFrame={16} accentColor={accentColor} />
             <span style={{ color: accentColor, fontSize: 48 * s, marginLeft: 10 }}>"</span>
           </div>
           {verseRef && (
@@ -175,7 +180,7 @@ export const MissionSlide: React.FC<Props> = ({
 
   return (
     <AbsoluteFill>
-      <Background
+      <Background {...rest}
         mediaDataUri={mediaDataUri}
         mediaType={mediaType}
         backgroundColor={backgroundColor}
@@ -185,6 +190,8 @@ export const MissionSlide: React.FC<Props> = ({
         entryEffect={entryEffect}
         slideType="mission"
         scrim={isCentered ? 'center' : 'left'}
+        motionIntensity={motionIntensity}
+        bgOverlayOpacity={bgOverlayOpacity}
       />
       <AbsoluteFill
         style={{
@@ -194,9 +201,12 @@ export const MissionSlide: React.FC<Props> = ({
           textAlign,
         }}
       >
-        <div
+        <KineticText
+          text={heading}
+          startFrame={6}
+          accentColor={accentColor}
           style={{
-            opacity: labelOp,
+            display: 'block',
             fontFamily: fontStack,
             fontWeight: 700,
             fontSize: 44,
@@ -205,14 +215,13 @@ export const MissionSlide: React.FC<Props> = ({
             marginBottom: 36,
             textShadow: heavyTextShadow,
           }}
-        >
-          {renderText(heading)}
-        </div>
-        <div
+        />
+        <KineticText
+          text={mission}
+          startFrame={16}
+          accentColor={accentColor}
           style={{
-            opacity: missionOp,
-            transform: `scale(${missionScale})`,
-            transformOrigin: isCentered ? 'center' : 'left center',
+            display: 'block',
             fontFamily: fontStack,
             fontWeight: 900,
             fontSize: missionSize * s,
@@ -222,9 +231,7 @@ export const MissionSlide: React.FC<Props> = ({
             maxWidth: 1700,
             textShadow: heavyTextShadow,
           }}
-        >
-          {mission}
-        </div>
+        />
         <div
           style={{
             marginTop: 40,

@@ -6,6 +6,8 @@ import {
   TextCard,
   type BaseSlideProps,
   renderText,
+  KineticText,
+  heroScale,
 } from './_shared';
 
 interface Props extends BaseSlideProps {
@@ -27,7 +29,12 @@ export const WorshipTimesSlide: React.FC<Props> = ({
   slideIndex,
   entryEffect,
   badge,
+  motionIntensity,
+  bgOverlayOpacity,
+  textScale,
+  ...rest
 }) => {
+  const s = heroScale(textScale);
   const frame = useCurrentFrame();
   const headOpacity = interpolate(frame, [4, 24], [0, 1], { extrapolateRight: 'clamp' });
 
@@ -46,40 +53,43 @@ export const WorshipTimesSlide: React.FC<Props> = ({
         : 'bottom-left';
     return (
       <AbsoluteFill>
-        <Background
+        <Background {...rest}
           mediaDataUri={mediaDataUri}
           mediaType={mediaType}
           backgroundColor={backgroundColor}
           accentColor={accentColor}
           slideIndex={slideIndex}
-        entryEffect={entryEffect}
-        slideType="worship-times"
+          entryEffect={entryEffect}
+          slideType="worship-times"
           photoShowcase
+          motionIntensity={motionIntensity}
+          bgOverlayOpacity={bgOverlayOpacity}
         />
-        <TextCard accentColor={accentColor} placement={placement as any} padding={40}>
+        <TextCard {...rest} accentColor={accentColor} placement={placement as any} padding={40}>
           <div
             style={{
               display: 'flex',
               alignItems: 'baseline',
               gap: 14,
               marginBottom: 24,
-              opacity: headOpacity,
             }}
           >
-            <div
+            <KineticText
+              text={heading}
+              startFrame={4}
+              accentColor={accentColor}
               style={{
+                display: 'block',
                 fontFamily: fontStack,
                 fontWeight: 900,
-                fontSize: 72,
+                fontSize: 72 * s,
                 color: '#fff',
                 letterSpacing: '-0.02em',
               }}
-            >
-              {renderText(heading)}
-            </div>
+            />
             <div style={{ width: Math.max(48, Math.min(240, (heading?.length ?? 4) * 18)), height: 4, background: accentColor, borderRadius: 2 }} />
           </div>
-          {services.map((s, i) => {
+          {services.map((svc, i) => {
             const delay = 14 + i * 8;
             const op = interpolate(frame, [delay, delay + 18], [0, 1], { extrapolateRight: 'clamp' });
             return (
@@ -98,33 +108,33 @@ export const WorshipTimesSlide: React.FC<Props> = ({
                   style={{
                     fontFamily: fontStack,
                     fontWeight: 700,
-                    fontSize: 38,
+                    fontSize: 38 * s,
                     color: '#fff',
-                    minWidth: 220,
+                    minWidth: Math.round(220 * s),
                   }}
                 >
-                  {s.name}
+                  {svc.name}
                 </span>
                 <span
                   style={{
                     fontFamily: fontStack,
                     fontWeight: 600,
-                    fontSize: 36,
+                    fontSize: 36 * s,
                     color: accentColor,
                   }}
                 >
-                  🕐 {s.schedule}
+                  🕐 {svc.schedule}
                 </span>
-                {s.place && (
+                {svc.place && (
                   <span
                     style={{
                       fontFamily: fontStack,
                       fontWeight: 500,
-                      fontSize: 30,
+                      fontSize: 30 * s,
                       color: 'rgba(255,255,255,0.75)',
                     }}
                   >
-                    📍 {s.place}
+                    📍 {svc.place}
                   </span>
                 )}
               </div>
@@ -143,7 +153,7 @@ export const WorshipTimesSlide: React.FC<Props> = ({
 
   return (
     <AbsoluteFill>
-      <Background
+      <Background {...rest}
         mediaDataUri={mediaDataUri}
         mediaType={mediaType}
         backgroundColor={backgroundColor}
@@ -154,28 +164,31 @@ export const WorshipTimesSlide: React.FC<Props> = ({
         entryEffect={entryEffect}
         slideType="worship-times"
         scrim="left"
+        motionIntensity={motionIntensity}
+        bgOverlayOpacity={bgOverlayOpacity}
       />
       <AbsoluteFill style={{ padding: '80px 120px', justifyContent: 'center' }}>
         <div
           style={{
-            opacity: headOpacity,
             display: 'flex',
             alignItems: 'baseline',
             gap: 24,
             marginBottom: 48,
           }}
         >
-          <div
+          <KineticText
+            text={heading}
+            startFrame={4}
+            accentColor={accentColor}
             style={{
+              display: 'block',
               fontFamily: fontStack,
               fontWeight: 900,
-              fontSize: 144,
+              fontSize: 144 * s,
               color: '#fff',
               letterSpacing: '-0.025em',
             }}
-          >
-            {renderText(heading)}
-          </div>
+          />
           <div style={{ width: 100, height: 4, background: accentColor, borderRadius: 2 }} />
         </div>
         <div
@@ -187,7 +200,7 @@ export const WorshipTimesSlide: React.FC<Props> = ({
             maxWidth: 1500,
           }}
         >
-          {services.map((s, i) => {
+          {services.map((svc, i) => {
             const delay = 16 + i * 12;
             const op = interpolate(frame, [delay, delay + 18], [0, 1], { extrapolateRight: 'clamp' });
             const x = interpolate(frame, [delay, delay + 18], [-12, 0], { extrapolateRight: 'clamp' });
@@ -198,7 +211,7 @@ export const WorshipTimesSlide: React.FC<Props> = ({
                   opacity: op,
                   transform: `translateX(${x}px)`,
                   display: 'grid',
-                  gridTemplateColumns: '420px 1fr auto',
+                  gridTemplateColumns: `${Math.round(420 * s)}px 1fr auto`,
                   gap: 32,
                   alignItems: 'center',
                   padding: '24px 0',
@@ -210,32 +223,32 @@ export const WorshipTimesSlide: React.FC<Props> = ({
                   style={{
                     fontFamily: fontStack,
                     fontWeight: 700,
-                    fontSize: 64,
+                    fontSize: 64 * s,
                     color: '#fff',
                   }}
                 >
-                  {s.name}
+                  {svc.name}
                 </div>
                 <div
                   style={{
                     fontFamily: fontStack,
                     fontWeight: 500,
-                    fontSize: 60,
+                    fontSize: 60 * s,
                     color: accentColor,
                   }}
                 >
-                  {s.schedule}
+                  {svc.schedule}
                 </div>
-                {s.place && (
+                {svc.place && (
                   <div
                     style={{
                       fontFamily: fontStack,
                       fontWeight: 400,
-                      fontSize: 48,
+                      fontSize: 48 * s,
                       color: 'rgba(255,255,255,0.65)',
                     }}
                   >
-                    {s.place}
+                    {svc.place}
                   </div>
                 )}
               </div>
@@ -246,7 +259,7 @@ export const WorshipTimesSlide: React.FC<Props> = ({
               style={{
                 fontFamily: fontStack,
                 fontWeight: 400,
-                fontSize: 52,
+                fontSize: 52 * s,
                 color: 'rgba(255,255,255,0.5)',
                 textAlign: 'center',
                 padding: '40px 0',

@@ -1,6 +1,8 @@
 import { AbsoluteFill, Img, interpolate, useCurrentFrame } from 'remotion';
 import { ChurchBadge, fontStack, heavyTextShadow, type BaseSlideProps ,
   renderText,
+  KineticText,
+  heroScale,
 } from './_shared';
 
 interface Props extends BaseSlideProps {
@@ -21,7 +23,11 @@ export const GallerySlide: React.FC<Props> = ({
   logoDataUri,
   badge,
   slideIndex,
+  motionIntensity,
+  bgOverlayOpacity,
+  textScale,
 }) => {
+  const s = heroScale(textScale);
   const frame = useCurrentFrame();
   const headOp = interpolate(frame, [4, 24], [0, 1], { extrapolateRight: 'clamp' });
 
@@ -33,25 +39,26 @@ export const GallerySlide: React.FC<Props> = ({
       <AbsoluteFill style={{ padding: '60px 100px', display: 'flex', flexDirection: 'column' }}>
         <div
           style={{
-            opacity: headOp,
             display: 'flex',
             alignItems: 'baseline',
             gap: 28,
             marginBottom: 36,
           }}
         >
-          <div
+          <KineticText
+            text={heading}
+            startFrame={6}
+            accentColor={accentColor}
             style={{
+              display: 'block',
               fontFamily: fontStack,
               fontWeight: 900,
-              fontSize: 110,
+              fontSize: 110 * s,
               color: '#fff',
               letterSpacing: '-0.025em',
               textShadow: heavyTextShadow,
             }}
-          >
-            {renderText(heading)}
-          </div>
+          />
           <div style={{ width: 120, height: 5, background: accentColor, borderRadius: 3 }} />
         </div>
 
@@ -106,7 +113,7 @@ export const GallerySlide: React.FC<Props> = ({
               marginTop: 24,
               fontFamily: fontStack,
               fontWeight: 500,
-              fontSize: 36,
+              fontSize: 36 * s,
               color: 'rgba(255,255,255,0.78)',
               textShadow: heavyTextShadow,
             }}

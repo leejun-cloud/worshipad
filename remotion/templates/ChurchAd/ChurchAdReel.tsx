@@ -15,6 +15,7 @@ import { ContactSlide } from './scenes/ContactSlide';
 import { InvitationSlide } from './scenes/InvitationSlide';
 import { MissionSlide } from './scenes/MissionSlide';
 import { GallerySlide } from './scenes/GallerySlide';
+import { getPreset } from '../../../components/church-ad/style-presets';
 
 export const CHURCH_AD_FPS = REELS_FPS;
 export const CHURCH_AD_WIDTH = 1920;
@@ -59,11 +60,18 @@ const slideSchema = z.object({
       'photo-card-bottom',
       'photo-card-side',
       'photo-card-bottom-left',
+      'full-bleed',
+      'immersive',
       'news-grid',
       'list-rows',
     ])
     .optional(),
   textScale: z.number().optional(),
+  cardScale: z.number().optional(),
+  bgOverlayOpacity: z.number().optional(),
+  imageScale: z.number().optional(),
+  imageX: z.number().optional(),
+  imageY: z.number().optional(),
   entryEffect: z
     .enum([
       'none',
@@ -127,6 +135,8 @@ export const churchAdSchema = z.object({
   bgmUrl: z.string().optional(),
   bgmVolume: z.number().optional().default(0.1),
   bgmTrackDurationSec: z.number().optional(),
+  stylePreset: z.enum(['cinematic', 'modern', 'warm', 'classic', 'energetic']).optional(),
+  bgOverlayOpacity: z.number().optional(),
 });
 
 export type ChurchAdReelProps = z.infer<typeof churchAdSchema>;
@@ -169,9 +179,15 @@ export const ChurchAdReel: React.FC<ChurchAdReelProps> = (props) => {
     bgmUrl,
     bgmVolume = 0.1,
     bgmTrackDurationSec,
+    stylePreset,
+    bgOverlayOpacity,
   } = props;
 
   useFonts();
+
+  const presetDef = stylePreset ? getPreset(stylePreset) : null;
+  const defaultEntry = presetDef?.defaultEntry;
+  const motionIntensity = presetDef?.motionIntensity ?? 1.0;
 
   const totalScenes = slides.length;
   let durations: number[];
@@ -220,8 +236,14 @@ export const ChurchAdReel: React.FC<ChurchAdReelProps> = (props) => {
             mediaType: (slide.mediaType ?? 'image') as 'image' | 'video',
             slideIndex: i,
             textScale: slide.textScale,
-            entryEffect: slide.entryEffect,
+            cardScale: slide.cardScale,
+            imageScale: slide.imageScale,
+            imageX: slide.imageX,
+            imageY: slide.imageY,
+            entryEffect: slide.entryEffect ?? defaultEntry,
             isStock,
+            motionIntensity,
+            bgOverlayOpacity: slide.bgOverlayOpacity ?? bgOverlayOpacity,
           };
           return (
             <Series.Sequence key={i} durationInFrames={durations[i]}>

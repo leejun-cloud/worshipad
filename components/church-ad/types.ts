@@ -87,6 +87,22 @@ export interface ChurchAdSlide {
    *  Wheel-scroll on the layer view's text/overlay clip adjusts this live. */
   textScale?: number;
 
+  /** Scale multiplier for the card overlay. 1.0 = default, 0.4–2.5 clamp.
+   *  Wheel-scroll on the layer view's overlay clip adjusts this live. */
+  cardScale?: number;
+
+  /** Slide-level overlay darkness (0.0 - 1.0) override. */
+  bgOverlayOpacity?: number;
+
+  /** Photo scale multiplier. 1.0 = default, 0.5–3.0 clamp. */
+  imageScale?: number;
+
+  /** Photo X position offset in pixels. */
+  imageX?: number;
+
+  /** Photo Y position offset in pixels. */
+  imageY?: number;
+
   /** Photo entry animation — applied to the background image when the slide
    *  enters. Inherits from project.stylePreset when unset. */
   entryEffect?: EntryEffect;

@@ -10,6 +10,7 @@ import {
   TextCard,
   type BaseSlideProps,
   renderText,
+  KineticText,
 } from './_shared';
 
 interface Props extends BaseSlideProps {
@@ -43,6 +44,9 @@ export const WelcomeSlide: React.FC<Props> = ({
   entryEffect,
   badge,
   textScale,
+  motionIntensity,
+  bgOverlayOpacity,
+  ...rest
 }) => {
   const s = heroScale(textScale);
   const frame = useCurrentFrame();
@@ -53,7 +57,7 @@ export const WelcomeSlide: React.FC<Props> = ({
   if (mediaDataUri && layout === 'full-bleed') {
     return (
       <AbsoluteFill>
-        <Background mediaDataUri={mediaDataUri} mediaType={mediaType} backgroundColor={backgroundColor} accentColor={accentColor} slideIndex={slideIndex} entryEffect={entryEffect} slideType="welcome" photoShowcase />
+        <Background {...rest} mediaDataUri={mediaDataUri} mediaType={mediaType} backgroundColor={backgroundColor} accentColor={accentColor} slideIndex={slideIndex} entryEffect={entryEffect} slideType="welcome" photoShowcase motionIntensity={motionIntensity} bgOverlayOpacity={bgOverlayOpacity} />
         <FullBleedOverlay heading={heading} subheading={message} accentColor={accentColor} />
         <ChurchBadge churchName={churchName} accentColor={accentColor} logoDataUri={logoDataUri} badge={badge} />
       </AbsoluteFill>
@@ -63,7 +67,7 @@ export const WelcomeSlide: React.FC<Props> = ({
   if (mediaDataUri && layout === 'immersive') {
     return (
       <AbsoluteFill>
-        <Background mediaDataUri={mediaDataUri} mediaType={mediaType} backgroundColor={backgroundColor} accentColor={accentColor} slideIndex={slideIndex} entryEffect={entryEffect} slideType="welcome" photoShowcase />
+        <Background {...rest} mediaDataUri={mediaDataUri} mediaType={mediaType} backgroundColor={backgroundColor} accentColor={accentColor} slideIndex={slideIndex} entryEffect={entryEffect} slideType="welcome" photoShowcase motionIntensity={motionIntensity} bgOverlayOpacity={bgOverlayOpacity} />
         <ImmersiveOverlay heading={heading} subheading={message} accentColor={accentColor} />
         <ChurchBadge churchName={churchName} accentColor={accentColor} logoDataUri={logoDataUri} badge={badge} />
       </AbsoluteFill>
@@ -88,7 +92,7 @@ export const WelcomeSlide: React.FC<Props> = ({
         : 'bottom';
     return (
       <AbsoluteFill>
-        <Background
+        <Background {...rest}
           mediaDataUri={mediaDataUri}
           mediaType={mediaType}
           backgroundColor={backgroundColor}
@@ -97,12 +101,16 @@ export const WelcomeSlide: React.FC<Props> = ({
           entryEffect={entryEffect}
           slideType="welcome"
           photoShowcase
+          motionIntensity={motionIntensity}
+          bgOverlayOpacity={bgOverlayOpacity}
         />
-        <TextCard accentColor={accentColor} placement={placement as any} padding={48}>
-          <div
+        <TextCard {...rest} accentColor={accentColor} placement={placement as any} padding={48}>
+          <KineticText
+            text={heading}
+            startFrame={6}
+            accentColor={accentColor}
             style={{
-              opacity: headOpacity,
-              transform: `translateY(${headY}px)`,
+              display: 'block',
               fontFamily: fontStack,
               fontWeight: 900,
               fontSize: 112 * s,
@@ -111,9 +119,7 @@ export const WelcomeSlide: React.FC<Props> = ({
               lineHeight: 1.1,
               marginBottom: 22,
             }}
-          >
-            {renderText(heading)}
-          </div>
+          />
           <div style={{ width: Math.max(60, Math.min(260, heading.length * 18)), height: 4, background: accentColor, borderRadius: 2, marginBottom: message ? 24 : 0 }} />
           {message && (
             <div
@@ -139,7 +145,7 @@ export const WelcomeSlide: React.FC<Props> = ({
 
   return (
     <AbsoluteFill>
-      <Background
+      <Background {...rest}
         mediaDataUri={mediaDataUri}
         mediaType={mediaType}
         backgroundColor={backgroundColor}
@@ -150,6 +156,8 @@ export const WelcomeSlide: React.FC<Props> = ({
         entryEffect={entryEffect}
         slideType="welcome"
         scrim={alignRight ? 'right' : 'left'}
+        motionIntensity={motionIntensity}
+        bgOverlayOpacity={bgOverlayOpacity}
       />
       <AbsoluteFill
         style={{
@@ -159,10 +167,12 @@ export const WelcomeSlide: React.FC<Props> = ({
           textAlign: alignRight ? 'right' : 'left',
         }}
       >
-        <div
+        <KineticText
+          text={heading}
+          startFrame={6}
+          accentColor={accentColor}
           style={{
-            opacity: headOpacity,
-            transform: `translateY(${headY}px)`,
+            display: 'block',
             fontFamily: fontStack,
             fontWeight: 900,
             fontSize: 180 * s,
@@ -172,9 +182,7 @@ export const WelcomeSlide: React.FC<Props> = ({
             marginBottom: 32,
             textShadow: heavyTextShadow,
           }}
-        >
-          {renderText(heading)}
-        </div>
+        />
         <div style={{ width: Math.max(60, Math.min(280, heading.length * 20)), height: 4, background: accentColor, borderRadius: 2, marginBottom: 32 }} />
         {message && (
           <div

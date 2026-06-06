@@ -575,6 +575,8 @@ export const runRenderJob = async (
       sceneDurationsSec: finalSceneDurations,
       bgmVolume,
       bgmTrackDurationSec,
+      stylePreset: (structure as any).stylePreset,
+      bgOverlayOpacity: (structure as any).bgOverlayOpacity,
       // audioUrl / bgmUrl deliberately omitted
     };
 

@@ -1,6 +1,8 @@
 import { AbsoluteFill, interpolate, useCurrentFrame } from 'remotion';
 import { Background, ChurchBadge, fontStack, type BaseSlideProps ,
   renderText,
+  KineticText,
+  heroScale,
 } from './_shared';
 
 interface Props extends BaseSlideProps {
@@ -26,7 +28,12 @@ export const ProgramsSlide: React.FC<Props> = ({
   slideIndex,
   entryEffect,
   badge,
+  motionIntensity,
+  bgOverlayOpacity,
+  textScale,
+  ...rest
 }) => {
+  const s = heroScale(textScale);
   const frame = useCurrentFrame();
   const cols = programs.length <= 2 ? programs.length : programs.length <= 4 ? 2 : 3;
 
@@ -46,24 +53,26 @@ export const ProgramsSlide: React.FC<Props> = ({
             }}
           >
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 20 }}>
-              <div
+              <KineticText
+                text={heading}
+                startFrame={4}
+                accentColor={accentColor}
                 style={{
+                  display: 'block',
                   fontFamily: fontStack,
                   fontWeight: 900,
-                  fontSize: 110,
+                  fontSize: 110 * s,
                   color: '#fff',
                   letterSpacing: '-0.025em',
                 }}
-              >
-                {renderText(heading)}
-              </div>
+              />
               <div style={{ width: 80, height: 4, background: accentColor, borderRadius: 2 }} />
             </div>
             <div
               style={{
                 fontFamily: fontStack,
                 fontWeight: 800,
-                fontSize: 36,
+                fontSize: 36 * s,
                 color: accentColor,
                 letterSpacing: '0.15em',
               }}
@@ -118,7 +127,7 @@ export const ProgramsSlide: React.FC<Props> = ({
                           borderRadius: 14,
                           background: `${accentColor}22`,
                           color: accentColor,
-                          fontSize: 34,
+                          fontSize: 34 * s,
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -130,7 +139,7 @@ export const ProgramsSlide: React.FC<Props> = ({
                         style={{
                           fontFamily: fontStack,
                           fontWeight: 800,
-                          fontSize: 46,
+                          fontSize: 46 * s,
                           color: '#1a2230',
                           letterSpacing: '-0.02em',
                           flex: 1,
@@ -147,7 +156,7 @@ export const ProgramsSlide: React.FC<Props> = ({
                         style={{
                           fontFamily: fontStack,
                           fontWeight: 700,
-                          fontSize: 30,
+                          fontSize: 30 * s,
                           color: accentColor,
                           marginBottom: 6,
                         }}
@@ -159,7 +168,7 @@ export const ProgramsSlide: React.FC<Props> = ({
                       style={{
                         fontFamily: fontStack,
                         fontWeight: 500,
-                        fontSize: 28,
+                        fontSize: 28 * s,
                         color: '#3a4252',
                         lineHeight: 1.45,
                       }}
@@ -172,7 +181,7 @@ export const ProgramsSlide: React.FC<Props> = ({
                       marginTop: 18,
                       fontFamily: fontStack,
                       fontWeight: 600,
-                      fontSize: 22,
+                      fontSize: 22 * s,
                       color: '#7d8696',
                     }}
                   >
@@ -189,7 +198,7 @@ export const ProgramsSlide: React.FC<Props> = ({
               textAlign: 'center',
               fontFamily: fontStack,
               fontWeight: 600,
-              fontSize: 28,
+              fontSize: 28 * s,
               color: 'rgba(255,255,255,0.7)',
             }}
           >
@@ -212,17 +221,19 @@ export const ProgramsSlide: React.FC<Props> = ({
       <AbsoluteFill style={{ background: backgroundColor ?? '#0f1c2e' }}>
         <AbsoluteFill style={{ padding: '70px 100px', display: 'flex', flexDirection: 'column', gap: 28 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 20 }}>
-            <div
+            <KineticText
+              text={heading}
+              startFrame={4}
+              accentColor={accentColor}
               style={{
+                display: 'block',
                 fontFamily: fontStack,
                 fontWeight: 900,
-                fontSize: 110,
+                fontSize: 110 * s,
                 color: '#fff',
                 letterSpacing: '-0.025em',
               }}
-            >
-              {renderText(heading)}
-            </div>
+            />
             <div style={{ width: 80, height: 4, background: accentColor, borderRadius: 2 }} />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 18, flex: 1 }}>
@@ -239,7 +250,7 @@ export const ProgramsSlide: React.FC<Props> = ({
                     borderRadius: 14,
                     padding: '24px 34px',
                     display: 'grid',
-                    gridTemplateColumns: '80px 360px 1fr',
+                    gridTemplateColumns: `${Math.round(80 * s)}px ${Math.round(360 * s)}px 1fr`,
                     gap: 28,
                     alignItems: 'center',
                   }}
@@ -251,7 +262,7 @@ export const ProgramsSlide: React.FC<Props> = ({
                       borderRadius: 14,
                       background: `${accentColor}22`,
                       color: accentColor,
-                      fontSize: 38,
+                      fontSize: 38 * s,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -263,7 +274,7 @@ export const ProgramsSlide: React.FC<Props> = ({
                     style={{
                       fontFamily: fontStack,
                       fontWeight: 800,
-                      fontSize: 48,
+                      fontSize: 48 * s,
                       color: '#fff',
                       letterSpacing: '-0.02em',
                     }}
@@ -274,7 +285,7 @@ export const ProgramsSlide: React.FC<Props> = ({
                     style={{
                       fontFamily: fontStack,
                       fontWeight: 500,
-                      fontSize: 34,
+                      fontSize: 34 * s,
                       color: 'rgba(255,255,255,0.8)',
                       lineHeight: 1.45,
                     }}
@@ -295,7 +306,7 @@ export const ProgramsSlide: React.FC<Props> = ({
               textAlign: 'center',
               fontFamily: fontStack,
               fontWeight: 500,
-              fontSize: 28,
+              fontSize: 28 * s,
               color: 'rgba(255,255,255,0.55)',
             }}
           >
@@ -314,7 +325,7 @@ export const ProgramsSlide: React.FC<Props> = ({
 
   return (
     <AbsoluteFill>
-      <Background
+      <Background {...rest}
         mediaDataUri={mediaDataUri}
         mediaType={mediaType}
         backgroundColor={backgroundColor}
@@ -325,6 +336,8 @@ export const ProgramsSlide: React.FC<Props> = ({
         entryEffect={entryEffect}
         slideType="programs"
         scrim="left"
+        motionIntensity={motionIntensity}
+        bgOverlayOpacity={bgOverlayOpacity}
       />
       <AbsoluteFill style={{ padding: '70px 120px', justifyContent: 'center' }}>
         <div
@@ -335,17 +348,19 @@ export const ProgramsSlide: React.FC<Props> = ({
             marginBottom: 48,
           }}
         >
-          <div
+          <KineticText
+            text={heading}
+            startFrame={4}
+            accentColor={accentColor}
             style={{
+              display: 'block',
               fontFamily: fontStack,
               fontWeight: 900,
-              fontSize: 132,
+              fontSize: 132 * s,
               color: '#fff',
               letterSpacing: '-0.025em',
             }}
-          >
-            {renderText(heading)}
-          </div>
+          />
           <div style={{ width: 100, height: 4, background: accentColor, borderRadius: 2 }} />
         </div>
         <div
@@ -375,7 +390,7 @@ export const ProgramsSlide: React.FC<Props> = ({
                   style={{
                     fontFamily: fontStack,
                     fontWeight: 700,
-                    fontSize: 60,
+                    fontSize: 60 * s,
                     color: '#fff',
                     marginBottom: 12,
                   }}
@@ -386,7 +401,7 @@ export const ProgramsSlide: React.FC<Props> = ({
                   style={{
                     fontFamily: fontStack,
                     fontWeight: 400,
-                    fontSize: 42,
+                    fontSize: 42 * s,
                     color: 'rgba(255,255,255,0.72)',
                     lineHeight: 1.45,
                     marginBottom: p.schedule ? 14 : 0,
@@ -399,7 +414,7 @@ export const ProgramsSlide: React.FC<Props> = ({
                     style={{
                       fontFamily: fontStack,
                       fontWeight: 600,
-                      fontSize: 38,
+                      fontSize: 38 * s,
                       color: accentColor,
                       letterSpacing: '0.01em',
                     }}

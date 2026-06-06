@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef, useState } from 'react';
 import { type ChurchAdSlide, SLIDE_TYPE_LABELS } from './types';
 import { MediaPicker } from './MediaPicker';
 
@@ -28,6 +29,101 @@ const labelStyle: React.CSSProperties = {
   textTransform: 'uppercase',
   marginBottom: 4,
   display: 'block',
+};
+
+const GalleryUrlsEditor: React.FC<{
+  urls: string[];
+  accentColor: string;
+  onChange: (urls: string[]) => void;
+}> = ({ urls, accentColor, onChange }) => {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+
+  const handleUpload = async (file: File) => {
+    setBusy('업로드 중…');
+    setErr(null);
+    try {
+      const fd = new FormData();
+      fd.set('file', file);
+      const res = await fetch('/api/church-ad/upload', { method: 'POST', body: fd });
+      const j = await res.json();
+      if (!res.ok) throw new Error(j.error || 'upload failed');
+      onChange([...urls, j.url]);
+    } catch (e: any) {
+      setErr(e.message);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+        {urls.map((url, i) => (
+          <div key={url + i} style={{ position: 'relative', aspectRatio: '1', borderRadius: 6, overflow: 'hidden', border: '1px solid #232a36' }}>
+            <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <button
+              onClick={() => onChange(urls.filter((_, idx) => idx !== i))}
+              style={{
+                position: 'absolute',
+                top: 4,
+                right: 4,
+                background: 'rgba(0,0,0,0.6)',
+                color: '#fff',
+                border: 0,
+                borderRadius: '50%',
+                width: 20,
+                height: 20,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 10,
+                cursor: 'pointer',
+                zIndex: 5,
+              }}
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+        {urls.length < 6 && (
+          <button
+            onClick={() => fileRef.current?.click()}
+            style={{
+              aspectRatio: '1',
+              borderRadius: 6,
+              border: '1px dashed #2a3140',
+              background: '#0f1216',
+              color: '#7d8696',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 11,
+              cursor: 'pointer',
+              gap: 4,
+            }}
+          >
+            <span style={{ fontSize: 16 }}>+</span>
+            사진 추가
+          </button>
+        )}
+      </div>
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) handleUpload(f);
+        }}
+      />
+      {busy && <div style={{ color: accentColor, fontSize: 11 }}>{busy}</div>}
+      {err && <div style={{ color: '#e87474', fontSize: 11 }}>⚠ {err}</div>}
+    </div>
+  );
 };
 
 export const Inspector: React.FC<Props> = ({ slide, accentColor, onChange }) => {
@@ -220,12 +316,16 @@ export const Inspector: React.FC<Props> = ({ slide, accentColor, onChange }) => 
             })}
           </div>
         </Field>
-      ) : (slide.mediaUrl || slide.mediaDataUri) ? (
-        <Field label="📐 레이아웃 (사진 있을 때)">
+      ) : slide.type !== 'gallery' ? (
+        <Field label="📐 레이아웃 (프레임 선택)">
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 6 }}>
             {(
               [
-                { v: 'center', label: '⬛ 기본 (어두운 오버레이)' },
+                { v: 'center', label: '⬛ 중앙 정렬' },
+                { v: 'left', label: '⬛ 좌측 정렬' },
+                { v: 'right', label: '⬛ 우측 정렬' },
+                { v: 'split-left', label: '🔲 좌우 분할 (텍스트 좌)' },
+                { v: 'split-right', label: '🔲 좌우 분할 (텍스트 우)' },
                 { v: 'photo-card', label: '🖼 사진 + 가운데 카드' },
                 { v: 'photo-card-bottom', label: '🖼 사진 + 하단 카드' },
                 { v: 'photo-card-side', label: '🖼 사진 + 우측 카드' },
@@ -305,6 +405,7 @@ export const Inspector: React.FC<Props> = ({ slide, accentColor, onChange }) => 
       {/* Heading is universal — textarea so Enter = line break in slide */}
       <Field label="제목 (heading)">
         <textarea
+          id="heading-input"
           value={slide.heading}
           onChange={(e) => onChange({ heading: e.target.value })}
           rows={slide.heading.includes('\n') ? slide.heading.split('\n').length + 1 : 2}
@@ -487,16 +588,110 @@ export const Inspector: React.FC<Props> = ({ slide, accentColor, onChange }) => 
         </Field>
       )}
 
-      {/* Media — universal, with upload + stock search */}
-      <div style={{ borderTop: '1px solid #232a36', paddingTop: 14 }}>
-        <span style={labelStyle}>배경 미디어</span>
-        <MediaPicker
-          mediaUrl={slide.mediaUrl}
-          mediaType={slide.mediaType}
-          imageSearchQuery={slide.imageSearchQuery}
-          accentColor={accentColor}
-          onChange={(next) => onChange(next)}
-        />
+      {/* Gallery urls for gallery type */}
+      {slide.type === 'gallery' && (
+        <Field label="갤러리 사진 목록 (3~6장)">
+          <GalleryUrlsEditor
+            urls={slide.galleryUrls ?? []}
+            accentColor={accentColor}
+            onChange={(urls) => onChange({ galleryUrls: urls })}
+          />
+        </Field>
+      )}
+
+      {/* Media — universal, with upload + stock search (hide for gallery slide) */}
+      {slide.type !== 'gallery' && (
+        <div style={{ borderTop: '1px solid #232a36', paddingTop: 14 }}>
+          <span style={labelStyle}>배경 미디어</span>
+          <MediaPicker
+            mediaUrl={slide.mediaUrl}
+            mediaType={slide.mediaType}
+            imageSearchQuery={slide.imageSearchQuery}
+            accentColor={accentColor}
+            onChange={(next) => onChange(next)}
+          />
+        </div>
+      )}
+
+      {/* 상세 디자인 조절 (글자/카드/사진 크기 및 위치) */}
+      <div style={{ borderTop: '1px solid #232a36', paddingTop: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <span style={labelStyle}>상세 디자인 조절</span>
+        
+        <Field label={`글자 크기 조절 — ${Math.round((slide.textScale ?? 1.0) * 100)}%`}>
+          <input
+            type="range"
+            min={0.4}
+            max={2.5}
+            step={0.05}
+            value={slide.textScale ?? 1.0}
+            onChange={(e) => onChange({ textScale: parseFloat(e.target.value) })}
+            style={{ width: '100%', accentColor }}
+          />
+        </Field>
+
+        <Field label={`배경 카드 크기 조절 — ${Math.round((slide.cardScale ?? 1.0) * 100)}%`}>
+          <input
+            type="range"
+            min={0.4}
+            max={2.5}
+            step={0.05}
+            value={slide.cardScale ?? 1.0}
+            onChange={(e) => onChange({ cardScale: parseFloat(e.target.value) })}
+            style={{ width: '100%', accentColor }}
+          />
+        </Field>
+
+        {slide.type !== 'gallery' && (slide.mediaUrl || slide.mediaDataUri) && (
+          <>
+            <Field label={`배경 어두움 (오버레이 투명도) — ${Math.round((slide.bgOverlayOpacity ?? 0.74) * 100)}%`}>
+              <input
+                type="range"
+                min={0.0}
+                max={1.0}
+                step={0.02}
+                value={slide.bgOverlayOpacity ?? 0.74}
+                onChange={(e) => onChange({ bgOverlayOpacity: parseFloat(e.target.value) })}
+                style={{ width: '100%', accentColor }}
+              />
+            </Field>
+
+            <Field label={`사진 크기 (줌) — ${Math.round((slide.imageScale ?? 1.0) * 100)}%`}>
+              <input
+                type="range"
+                min={0.5}
+                max={3.0}
+                step={0.05}
+                value={slide.imageScale ?? 1.0}
+                onChange={(e) => onChange({ imageScale: parseFloat(e.target.value) })}
+                style={{ width: '100%', accentColor }}
+              />
+            </Field>
+
+            <Field label={`사진 가로 이동 — ${slide.imageX ?? 0}px`}>
+              <input
+                type="range"
+                min={-1000}
+                max={1000}
+                step={5}
+                value={slide.imageX ?? 0}
+                onChange={(e) => onChange({ imageX: parseInt(e.target.value, 10) })}
+                style={{ width: '100%', accentColor }}
+              />
+            </Field>
+
+            <Field label={`사진 세로 이동 — ${slide.imageY ?? 0}px`}>
+              <input
+                type="range"
+                min={-1000}
+                max={1000}
+                step={5}
+                value={slide.imageY ?? 0}
+                onChange={(e) => onChange({ imageY: parseInt(e.target.value, 10) })}
+                style={{ width: '100%', accentColor }}
+              />
+            </Field>
+          </>
+        )}
       </div>
 
       {/* Speaker note + duration */}

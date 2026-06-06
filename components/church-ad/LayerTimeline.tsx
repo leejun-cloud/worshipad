@@ -74,25 +74,34 @@ export const LayerTimeline: React.FC<Props> = ({
 
   /** Adjust the right field for this layer in response to a wheel event. */
   const handleWheel = (
-    e: React.WheelEvent,
+    e: any,
     slideIndex: number,
     layerKey: string
   ) => {
     const slide = project.slides[slideIndex];
     if (!slide) return;
-    e.preventDefault();
-    e.stopPropagation();
-    const step = e.deltaY < 0 ? +1 : -1;
-    if (layerKey === 'text' || layerKey === 'overlay') {
-      const next = clampScale((slide.textScale ?? 1) + step * 0.05);
+    
+    if (layerKey === 'text') {
+      const delta = -e.deltaY * 0.001;
+      const next = clampScale((slide.textScale ?? 1) + delta);
       onSlideChange(slideIndex, { textScale: next });
       setWheelHint({
         slideIndex,
         layerKey,
         label: `글자 크기 ${Math.round(next * 100)}%`,
       });
+    } else if (layerKey === 'overlay') {
+      const delta = -e.deltaY * 0.001;
+      const next = clampScale((slide.cardScale ?? 1) + delta);
+      onSlideChange(slideIndex, { cardScale: next });
+      setWheelHint({
+        slideIndex,
+        layerKey,
+        label: `배경 카드 크기 ${Math.round(next * 100)}%`,
+      });
     } else if (layerKey === 'tts') {
-      const next = Math.round(clampDur((slide.durationSec ?? 6) + step * 0.5) * 10) / 10;
+      const delta = -e.deltaY * 0.01;
+      const next = Math.round(clampDur((slide.durationSec ?? 6) + delta) * 10) / 10;
       onSlideChange(slideIndex, { durationSec: next });
       setWheelHint({ slideIndex, layerKey, label: `${next.toFixed(1)}초` });
     }
@@ -233,6 +242,18 @@ export const LayerTimeline: React.FC<Props> = ({
     return (
       <div
         key={`${layer.key}-${i}`}
+        ref={(el) => {
+          if (!el) return;
+          if (wheelEnabled) {
+            el.onwheel = (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleWheel(e, i, layer.key);
+            };
+          } else {
+            el.onwheel = null;
+          }
+        }}
         onClick={() => onSelect(i)}
         onDoubleClick={(e) => {
           if (!editableField) return;
@@ -240,7 +261,6 @@ export const LayerTimeline: React.FC<Props> = ({
           const initial = (slide[editableField] as string | undefined) ?? '';
           startEdit(i, editableField, initial);
         }}
-        onWheel={wheelEnabled ? (e) => handleWheel(e, i, layer.key) : undefined}
         title={
           editableField
             ? wheelEnabled

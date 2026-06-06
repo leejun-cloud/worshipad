@@ -76,15 +76,18 @@ export async function POST(req: Request) {
       });
       totalAudioSec = sceneDurationsSec.reduce((a, b) => a + b, 0);
 
-      let concatenated = concatenateWavs(segments.map((s) => s.audioBuffer), SCENE_GAP_SEC);
-      // Pad with silence so the WAV length equals totalAudioSec.
-      // Without padding, muxAudio's -shortest trims the video to the raw TTS duration.
-      const rawTtsSec = segments.reduce((a, s) => a + s.durationSec, 0) + (segments.length - 1) * SCENE_GAP_SEC;
-      const padSec = totalAudioSec - rawTtsSec;
-      if (padSec > 0.05) {
-        const silence = buildSilentWav(padSec);
-        concatenated = concatenateWavs([concatenated, silence]);
-      }
+      // Pad EACH segment individually to exactly match `sceneDurationsSec[i]`
+      const paddedSegments = segments.map((s, i) => {
+        const targetDur = sceneDurationsSec![i];
+        const padDur = targetDur - s.durationSec;
+        if (padDur > 0.05) {
+          return concatenateWavs([s.audioBuffer, buildSilentWav(padDur)]);
+        }
+        return s.audioBuffer;
+      });
+
+      // Combine padded segments with NO additional gap, since the padding includes it.
+      let concatenated = concatenateWavs(paddedSegments, 0);
       const audioFile = `${randomUUID()}.wav`;
       await writeFile(path.join(AUDIO_DIR, audioFile), concatenated);
       audioUrl = `/audio/${audioFile}`;

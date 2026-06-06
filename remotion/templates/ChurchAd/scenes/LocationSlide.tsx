@@ -1,6 +1,8 @@
 import { AbsoluteFill, interpolate, useCurrentFrame } from 'remotion';
 import { Background, ChurchBadge, fontStack, TextCard, type BaseSlideProps ,
   renderText,
+  KineticText,
+  heroScale,
 } from './_shared';
 
 interface Props extends BaseSlideProps {
@@ -24,7 +26,12 @@ export const LocationSlide: React.FC<Props> = ({
   slideIndex,
   entryEffect,
   badge,
+  motionIntensity,
+  bgOverlayOpacity,
+  textScale,
+  ...rest
 }) => {
+  const s = heroScale(textScale);
   const frame = useCurrentFrame();
   const op = interpolate(frame, [4, 28], [0, 1], { extrapolateRight: 'clamp' });
   const addrOp = interpolate(frame, [18, 44], [0, 1], { extrapolateRight: 'clamp' });
@@ -38,7 +45,7 @@ export const LocationSlide: React.FC<Props> = ({
     const placement = layout === 'photo-card-side' ? 'side-right' : layout === 'photo-card' ? 'center' : 'bottom';
     return (
       <AbsoluteFill>
-        <Background
+        <Background {...rest}
           mediaDataUri={mediaDataUri}
           mediaType={mediaType}
           backgroundColor={backgroundColor}
@@ -47,21 +54,33 @@ export const LocationSlide: React.FC<Props> = ({
           entryEffect={entryEffect}
           slideType="location"
           photoShowcase
+          motionIntensity={motionIntensity}
+          bgOverlayOpacity={bgOverlayOpacity}
         />
-        <TextCard accentColor={accentColor} placement={placement as any} padding={44}>
-          <div style={{ opacity: op, display: 'flex', alignItems: 'baseline', gap: 18, marginBottom: 24 }}>
-            <div style={{ fontFamily: fontStack, fontWeight: 900, fontSize: 82, color: '#fff', letterSpacing: '-0.025em' }}>
-              {renderText(heading)}
-            </div>
+        <TextCard {...rest} accentColor={accentColor} placement={placement as any} padding={44}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 18, marginBottom: 24 }}>
+            <KineticText
+              text={heading}
+              startFrame={4}
+              accentColor={accentColor}
+              style={{
+                display: 'block',
+                fontFamily: fontStack,
+                fontWeight: 900,
+                fontSize: 82 * s,
+                color: '#fff',
+                letterSpacing: '-0.025em',
+              }}
+            />
             <div style={{ width: 80, height: 4, background: accentColor, borderRadius: 2 }} />
           </div>
           {address && (
-            <div style={{ opacity: addrOp, fontFamily: fontStack, fontWeight: 700, fontSize: 44, color: '#fff', lineHeight: 1.35, marginBottom: transit ? 18 : 0 }}>
+            <div style={{ opacity: addrOp, fontFamily: fontStack, fontWeight: 700, fontSize: 44 * s, color: '#fff', lineHeight: 1.35, marginBottom: transit ? 18 : 0 }}>
               <span style={{ color: accentColor }}>📍 </span>{address}
             </div>
           )}
           {transit && (
-            <div style={{ opacity: transOp, fontFamily: fontStack, fontWeight: 500, fontSize: 36, color: 'rgba(255,255,255,0.82)', lineHeight: 1.45 }}>
+            <div style={{ opacity: transOp, fontFamily: fontStack, fontWeight: 500, fontSize: 36 * s, color: 'rgba(255,255,255,0.82)', lineHeight: 1.45 }}>
               <span style={{ color: accentColor }}>🚇 </span>{transit}
             </div>
           )}
@@ -73,7 +92,7 @@ export const LocationSlide: React.FC<Props> = ({
 
   return (
     <AbsoluteFill>
-      <Background
+      <Background {...rest}
         mediaDataUri={mediaDataUri}
         mediaType={mediaType}
         backgroundColor={backgroundColor}
@@ -83,6 +102,8 @@ export const LocationSlide: React.FC<Props> = ({
         entryEffect={entryEffect}
         slideType="location"
         scrim={alignRight ? 'right' : 'left'}
+        motionIntensity={motionIntensity}
+        bgOverlayOpacity={bgOverlayOpacity}
       />
       <AbsoluteFill
         style={{
@@ -94,25 +115,26 @@ export const LocationSlide: React.FC<Props> = ({
       >
         <div
           style={{
-            opacity: op,
-              display: 'flex',
-              alignItems: 'baseline',
-              flexDirection: alignRight ? 'row-reverse' : 'row',
-              gap: 24,
+            display: 'flex',
+            alignItems: 'baseline',
+            flexDirection: alignRight ? 'row-reverse' : 'row',
+            gap: 24,
             marginBottom: 60,
           }}
         >
-          <div
+          <KineticText
+            text={heading}
+            startFrame={4}
+            accentColor={accentColor}
             style={{
+              display: 'block',
               fontFamily: fontStack,
               fontWeight: 900,
-              fontSize: 168,
+              fontSize: 168 * s,
               color: '#fff',
               letterSpacing: '-0.025em',
             }}
-          >
-            {renderText(heading)}
-          </div>
+          />
           <div style={{ width: 100, height: 4, background: accentColor, borderRadius: 2 }} />
         </div>
         {address && (
@@ -129,24 +151,26 @@ export const LocationSlide: React.FC<Props> = ({
           >
             <div
               style={{
-                fontSize: 70,
+                fontSize: 70 * s,
                 color: accentColor,
                 marginTop: 4,
               }}
             >
               📍
             </div>
-            <div
+            <KineticText
+              text={address}
+              startFrame={18}
+              accentColor={accentColor}
               style={{
+                display: 'block',
                 fontFamily: fontStack,
                 fontWeight: 700,
-                fontSize: 80,
+                fontSize: 80 * s,
                 color: '#fff',
                 lineHeight: 1.4,
               }}
-            >
-              {address}
-            </div>
+            />
           </div>
         )}
         {transit && (
@@ -162,7 +186,7 @@ export const LocationSlide: React.FC<Props> = ({
           >
             <div
               style={{
-                fontSize: 60,
+                fontSize: 60 * s,
                 color: accentColor,
                 marginTop: 4,
               }}
@@ -173,7 +197,7 @@ export const LocationSlide: React.FC<Props> = ({
               style={{
                 fontFamily: fontStack,
                 fontWeight: 400,
-                fontSize: 60,
+                fontSize: 60 * s,
                 color: 'rgba(255,255,255,0.78)',
                 lineHeight: 1.5,
               }}

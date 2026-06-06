@@ -8,6 +8,8 @@ import {
   TextCard,
   type BaseSlideProps,
   renderText,
+  KineticText,
+  heroScale,
 } from './_shared';
 
 interface Props extends BaseSlideProps {
@@ -45,7 +47,12 @@ export const EventSlide: React.FC<Props> = ({
   slideIndex,
   entryEffect,
   badge,
+  motionIntensity,
+  bgOverlayOpacity,
+  textScale,
+  ...rest
 }) => {
+  const s = heroScale(textScale);
   const frame = useCurrentFrame();
   const op = interpolate(frame, [4, 26], [0, 1], { extrapolateRight: 'clamp' });
   const y = interpolate(frame, [4, 26], [22, 0], { extrapolateRight: 'clamp' });
@@ -53,7 +60,7 @@ export const EventSlide: React.FC<Props> = ({
   if (mediaDataUri && layout === 'full-bleed') {
     return (
       <AbsoluteFill>
-        <Background mediaDataUri={mediaDataUri} mediaType={mediaType} backgroundColor={backgroundColor} accentColor={accentColor} slideIndex={slideIndex} entryEffect={entryEffect} slideType="event" photoShowcase />
+        <Background {...rest} mediaDataUri={mediaDataUri} mediaType={mediaType} backgroundColor={backgroundColor} accentColor={accentColor} slideIndex={slideIndex} entryEffect={entryEffect} slideType="event" photoShowcase motionIntensity={motionIntensity} bgOverlayOpacity={bgOverlayOpacity} />
         <FullBleedOverlay heading={heading} subheading={subheading || (date ? `${date}${location ? ' · ' + location : ''}` : undefined)} accentColor={accentColor} />
         <ChurchBadge churchName={churchName} accentColor={accentColor} logoDataUri={logoDataUri} badge={badge} />
       </AbsoluteFill>
@@ -62,7 +69,7 @@ export const EventSlide: React.FC<Props> = ({
   if (mediaDataUri && layout === 'immersive') {
     return (
       <AbsoluteFill>
-        <Background mediaDataUri={mediaDataUri} mediaType={mediaType} backgroundColor={backgroundColor} accentColor={accentColor} slideIndex={slideIndex} entryEffect={entryEffect} slideType="event" photoShowcase />
+        <Background {...rest} mediaDataUri={mediaDataUri} mediaType={mediaType} backgroundColor={backgroundColor} accentColor={accentColor} slideIndex={slideIndex} entryEffect={entryEffect} slideType="event" photoShowcase motionIntensity={motionIntensity} bgOverlayOpacity={bgOverlayOpacity} />
         <ImmersiveOverlay heading={heading} subheading={subheading || (date ? `${date}${location ? ' · ' + location : ''}` : undefined)} accentColor={accentColor} />
         <ChurchBadge churchName={churchName} accentColor={accentColor} logoDataUri={logoDataUri} badge={badge} />
       </AbsoluteFill>
@@ -89,17 +96,19 @@ export const EventSlide: React.FC<Props> = ({
         : 'center';
     return (
       <AbsoluteFill>
-        <Background
+        <Background {...rest}
           mediaDataUri={mediaDataUri}
           mediaType={mediaType}
           backgroundColor={backgroundColor}
           accentColor={accentColor}
           slideIndex={slideIndex}
-        entryEffect={entryEffect}
-        slideType="event"
+          entryEffect={entryEffect}
+          slideType="event"
           photoShowcase
+          motionIntensity={motionIntensity}
+          bgOverlayOpacity={bgOverlayOpacity}
         />
-        <TextCard accentColor={accentColor} placement={placement as any} padding={44}>
+        <TextCard {...rest} accentColor={accentColor} placement={placement as any} padding={44}>
           {eventBadge && (
             <div
               style={{
@@ -110,7 +119,7 @@ export const EventSlide: React.FC<Props> = ({
                 color: accentColor,
                 fontFamily: fontStack,
                 fontWeight: 700,
-                fontSize: 26,
+                fontSize: 26 * s,
                 padding: '6px 14px',
                 borderRadius: 999,
                 marginBottom: 18,
@@ -119,28 +128,28 @@ export const EventSlide: React.FC<Props> = ({
               {eventBadge}
             </div>
           )}
-          <div
+          <KineticText
+            text={heading}
+            startFrame={6}
+            accentColor={accentColor}
             style={{
-              opacity: op,
-              transform: `translateY(${y}px)`,
+              display: 'block',
               fontFamily: fontStack,
               fontWeight: 900,
-              fontSize: 96,
+              fontSize: 96 * s,
               color: '#fff',
               lineHeight: 1.05,
               letterSpacing: '-0.025em',
               marginBottom: subheading ? 14 : 22,
             }}
-          >
-            {renderText(heading)}
-          </div>
+          />
           {subheading && (
             <div
               style={{
                 opacity: op,
                 fontFamily: fontStack,
                 fontWeight: 500,
-                fontSize: 38,
+                fontSize: 38 * s,
                 color: 'rgba(255,255,255,0.85)',
                 lineHeight: 1.4,
                 marginBottom: 22,
@@ -155,7 +164,7 @@ export const EventSlide: React.FC<Props> = ({
                 style={{
                   fontFamily: fontStack,
                   fontWeight: 600,
-                  fontSize: 34,
+                  fontSize: 34 * s,
                   color: '#fff',
                   display: 'flex',
                   alignItems: 'center',
@@ -170,7 +179,7 @@ export const EventSlide: React.FC<Props> = ({
                 style={{
                   fontFamily: fontStack,
                   fontWeight: 600,
-                  fontSize: 34,
+                  fontSize: 34 * s,
                   color: '#fff',
                   display: 'flex',
                   alignItems: 'center',
@@ -186,7 +195,7 @@ export const EventSlide: React.FC<Props> = ({
                 style={{
                   fontFamily: fontStack,
                   fontWeight: 500,
-                  fontSize: 30,
+                  fontSize: 30 * s,
                   color: 'rgba(255,255,255,0.82)',
                 }}
               >
@@ -207,7 +216,7 @@ export const EventSlide: React.FC<Props> = ({
 
   return (
     <AbsoluteFill>
-      <Background
+      <Background {...rest}
         mediaDataUri={mediaDataUri}
         mediaType={mediaType}
         backgroundColor={backgroundColor}
@@ -217,6 +226,8 @@ export const EventSlide: React.FC<Props> = ({
         entryEffect={entryEffect}
         slideType="event"
         scrim="left"
+        motionIntensity={motionIntensity}
+        bgOverlayOpacity={bgOverlayOpacity}
       />
       <AbsoluteFill style={{ padding: '0 120px', justifyContent: 'center' }}>
         <div
@@ -225,7 +236,7 @@ export const EventSlide: React.FC<Props> = ({
             transform: `translateY(${y}px)`,
             fontFamily: fontStack,
             fontWeight: 700,
-            fontSize: 46,
+            fontSize: 46 * s,
             color: accentColor,
             letterSpacing: '0.06em',
             marginBottom: 22,
@@ -233,29 +244,29 @@ export const EventSlide: React.FC<Props> = ({
         >
           ✦ 특별 안내
         </div>
-        <div
+        <KineticText
+          text={heading}
+          startFrame={6}
+          accentColor={accentColor}
           style={{
-            opacity: op,
-            transform: `translateY(${y}px)`,
+            display: 'block',
             fontFamily: fontStack,
             fontWeight: 900,
-            fontSize: 184,
+            fontSize: 184 * s,
             color: '#fff',
             lineHeight: 1.05,
             letterSpacing: '-0.03em',
             marginBottom: 24,
             maxWidth: 1500,
           }}
-        >
-          {renderText(heading)}
-        </div>
+        />
         {subheading && (
           <div
             style={{
               opacity: op,
               fontFamily: fontStack,
               fontWeight: 400,
-              fontSize: 64,
+              fontSize: 64 * s,
               color: 'rgba(255,255,255,0.78)',
               lineHeight: 1.4,
               maxWidth: 1400,
@@ -282,7 +293,7 @@ export const EventSlide: React.FC<Props> = ({
                   borderRadius: 12,
                   fontFamily: fontStack,
                   fontWeight: 800,
-                  fontSize: 56,
+                  fontSize: 56 * s,
                 }}
               >
                 {date}
@@ -297,7 +308,7 @@ export const EventSlide: React.FC<Props> = ({
                   borderRadius: 12,
                   fontFamily: fontStack,
                   fontWeight: 600,
-                  fontSize: 56,
+                  fontSize: 56 * s,
                 }}
               >
                 📍 {location}
@@ -313,7 +324,7 @@ export const EventSlide: React.FC<Props> = ({
                 style={{
                   fontFamily: fontStack,
                   fontWeight: 500,
-                  fontSize: 52,
+                  fontSize: 52 * s,
                   color: 'rgba(255,255,255,0.78)',
                 }}
               >

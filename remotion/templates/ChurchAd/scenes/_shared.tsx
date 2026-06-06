@@ -15,6 +15,14 @@ export interface BaseSlideProps {
   slideIndex?: number;
   /** Hero-text size multiplier. 1.0 = default. */
   textScale?: number;
+  /** Scale multiplier for the card overlay. 1.0 = default. */
+  cardScale?: number;
+  /** Photo scale multiplier. 1.0 = default. */
+  imageScale?: number;
+  /** Photo X position offset in pixels. */
+  imageX?: number;
+  /** Photo Y position offset in pixels. */
+  imageY?: number;
   /** Photo entry animation. */
   entryEffect?: EntryEffect;
   /** Slide type — used to pick a tone-mapping grade for the bg media. */
@@ -22,6 +30,8 @@ export interface BaseSlideProps {
   /** Override tone-mapping grade. When omitted, inferred from slideType. */
   toneGrade?: ToneGrade;
   isStock?: boolean;
+  motionIntensity?: number;
+  bgOverlayOpacity?: number;
 }
 
 /** Clamp + default for the hero-text multiplier. */
@@ -104,35 +114,54 @@ export const TextCard: React.FC<{
   /** Card placement preset. */
   placement?: 'bottom' | 'bottom-left' | 'side-right' | 'side-left' | 'center' | 'corner-tl';
   padding?: number;
-}> = ({ accentColor = '#d4a657', children, style, placement = 'bottom', padding = 56 }) => {
+  cardScale?: number;
+}> = ({ accentColor = '#d4a657', children, style, placement = 'bottom', padding = 56, cardScale = 1.0 }) => {
   const placementStyle: React.CSSProperties = (() => {
     switch (placement) {
       case 'bottom':
-        return { left: 80, right: 80, bottom: 80 };
+        return { left: 80, right: 80, bottom: 80, transformOrigin: 'bottom center' };
       case 'bottom-left':
-        return { left: 80, bottom: 80, maxWidth: 1200 };
+        return { left: 80, bottom: 80, maxWidth: 1200, transformOrigin: 'bottom left' };
       case 'side-right':
-        return { right: 80, top: '50%', transform: 'translateY(-50%)', maxWidth: 760 };
+        return { right: 80, top: '50%', maxWidth: 760, transformOrigin: 'center right' };
       case 'side-left':
-        return { left: 80, top: '50%', transform: 'translateY(-50%)', maxWidth: 760 };
+        return { left: 80, top: '50%', maxWidth: 760, transformOrigin: 'center left' };
       case 'corner-tl':
-        return { top: 80, left: 80, maxWidth: 900 };
+        return { top: 80, left: 80, maxWidth: 900, transformOrigin: 'top left' };
       case 'center':
       default:
         return {
           left: '50%',
           top: '50%',
-          transform: 'translate(-50%, -50%)',
           maxWidth: 1400,
+          transformOrigin: 'center center',
         };
     }
   })();
 
+  const finalTransform = (() => {
+    const scaleStr = cardScale !== 1 ? `scale(${cardScale})` : '';
+    if (placement === 'center') {
+      return `translate(-50%, -50%) ${scaleStr}`.trim();
+    }
+    if (placement === 'side-right' || placement === 'side-left') {
+      return `translateY(-50%) ${scaleStr}`.trim();
+    }
+    return scaleStr || undefined;
+  })();
+
   return (
     <div
+      onClick={(e) => {
+        e.stopPropagation();
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('editor-edit-slide'));
+        }
+      }}
       style={{
         position: 'absolute',
         ...placementStyle,
+        transform: finalTransform,
         padding,
         background: 'rgba(15, 28, 46, 0.86)',
         backdropFilter: 'blur(14px)',
@@ -140,6 +169,7 @@ export const TextCard: React.FC<{
         border: `1px solid ${accentColor}55`,
         borderRadius: 28,
         boxShadow: '0 24px 80px rgba(0,0,0,0.55)',
+        cursor: 'pointer',
         ...style,
       }}
     >
@@ -173,6 +203,11 @@ export const Background: React.FC<{
   /** Override tone grade. */
   toneGrade?: ToneGrade;
   isStock?: boolean;
+  motionIntensity?: number;
+  bgOverlayOpacity?: number;
+  imageScale?: number;
+  imageX?: number;
+  imageY?: number;
 }> = ({
   mediaDataUri,
   mediaType = 'image',
@@ -188,6 +223,11 @@ export const Background: React.FC<{
   slideType,
   toneGrade,
   isStock = false,
+  motionIntensity = 1.0,
+  bgOverlayOpacity,
+  imageScale = 1.0,
+  imageX = 0,
+  imageY = 0,
 }) => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
@@ -197,9 +237,9 @@ export const Background: React.FC<{
   });
   // Premium scene transitions — replaces the old flat 12-frame fade.
   //
-  // ENTER (0 → 18f): the bg image arrives blurred + slightly scaled-up, then
+  // ENTER (0 → 12f): the bg image arrives blurred + slightly scaled-up, then
   // resolves to crisp. Feels like a film cut into focus, not a crossfade.
-  // EXIT  (last 18f): image gently blurs out + scales down + fades to ~0.0.
+  // EXIT  (last 12f): image gently blurs out + scales down + fades to ~0.0.
   // Because Series renders strictly sequential (no overlap), the asymmetric
   // enter/exit creates a perceptual "wipe-through-blur" handoff.
   const entry = entryTransform(entryEffect, frame);
@@ -207,9 +247,30 @@ export const Background: React.FC<{
   const isShowcase = photoShowcase && !isStockMedia;
   const finalOpacity = isStockMedia ? 0.22 : entry.opacity;
 
-  const transitionBlurPx = 0;
-  const transitionScale = 1;
-  const transitionOpacity = 1;
+  const ENTER_FRAMES = 12;
+  const EXIT_FRAMES = 12;
+
+  const transitionOpacity = interpolate(
+    frame,
+    [0, ENTER_FRAMES, Math.max(0, durationInFrames - EXIT_FRAMES), durationInFrames],
+    [0, 1, 1, 0],
+    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
+  );
+
+  const transitionBlurPx = interpolate(
+    frame,
+    [0, ENTER_FRAMES, Math.max(0, durationInFrames - EXIT_FRAMES), durationInFrames],
+    [15, 0, 0, 15],
+    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
+  );
+
+  const transitionScale = interpolate(
+    frame,
+    [0, ENTER_FRAMES, Math.max(0, durationInFrames - EXIT_FRAMES), durationInFrames],
+    [1.06, 1.0, 1.0, 0.96],
+    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
+  );
+
   const grade = toneGrade ?? (slideType ? gradeForSlideType(slideType) : 'warm');
   const toneFilter = filterForGrade(grade);
   const baseBlur = blur ? 8 : 0;
@@ -218,12 +279,14 @@ export const Background: React.FC<{
     width: '100%',
     height: '100%',
     objectFit: 'cover',
-    transform: `${motionTransform(variant, progress)} scale(${transitionScale}) ${entry.transform}`.trim(),
+    transform: `${motionTransform(variant, progress, motionIntensity)} scale(${transitionScale}) ${entry.transform} translate(${imageX}px, ${imageY}px) scale(${imageScale})`.trim(),
     transformOrigin: 'center',
     filter: `${toneFilter}${totalBlur > 0.1 ? ` blur(${totalBlur.toFixed(1)}px)` : ''}`,
     opacity: Math.min(transitionOpacity, finalOpacity),
     willChange: 'transform, filter, opacity',
   };
+  const finalOverlayOpacity = bgOverlayOpacity !== undefined ? bgOverlayOpacity : overlayOpacity;
+
   return (
     <AbsoluteFill style={{ background: backgroundColor, overflow: 'hidden' }}>
       {mediaDataUri && mediaType === 'video' ? (
@@ -284,7 +347,7 @@ export const Background: React.FC<{
       {mediaDataUri && !isShowcase && (
         <>
           {/* Base flat overlay — guarantees a minimum darkness against bright photos. */}
-          <AbsoluteFill style={{ background: `rgba(15,28,46,${overlayOpacity})` }} />
+          <AbsoluteFill style={{ background: `rgba(15,28,46,${finalOverlayOpacity})` }} />
           {/* Directional scrim toward text region for extra contrast. */}
           {scrim !== 'none' && (
             <AbsoluteFill
@@ -526,7 +589,15 @@ export const FullBleedOverlay: React.FC<{
   const subOpacity = interpolate(frame, [startFrame + 18, startFrame + 38], [0, 1], { extrapolateRight: 'clamp' });
   const textShadow = '0 4px 32px rgba(0,0,0,0.85), 0 2px 8px rgba(0,0,0,0.9)';
   return (
-    <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center', padding: '0 100px', textAlign: 'center' }}>
+    <AbsoluteFill
+      onClick={(e) => {
+        e.stopPropagation();
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('editor-edit-slide'));
+        }
+      }}
+      style={{ justifyContent: 'center', alignItems: 'center', padding: '0 100px', textAlign: 'center', cursor: 'pointer' }}
+    >
       {/* Very subtle center vignette for contrast — keeps photo mostly visible */}
       <AbsoluteFill style={{
         background: 'radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.0) 70%)',
@@ -589,7 +660,15 @@ export const ImmersiveOverlay: React.FC<{
   const botOpacity = interpolate(frame, [startFrame + 16, startFrame + 36], [0, 1], { extrapolateRight: 'clamp' });
   const textShadow = '0 3px 20px rgba(0,0,0,0.9)';
   return (
-    <AbsoluteFill>
+    <AbsoluteFill
+      onClick={(e) => {
+        e.stopPropagation();
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('editor-edit-slide'));
+        }
+      }}
+      style={{ cursor: 'pointer' }}
+    >
       {/* Top gradient bar */}
       <AbsoluteFill style={{
         background: 'linear-gradient(to bottom, rgba(0,0,0,0.62) 0%, rgba(0,0,0,0.0) 35%)',

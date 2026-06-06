@@ -34,6 +34,7 @@ export const VerseSlide: React.FC<Props> = ({
   entryEffect,
   badge,
   textScale,
+  ...rest
 }) => {
   const s = heroScale(textScale);
   const frame = useCurrentFrame();
@@ -44,7 +45,7 @@ export const VerseSlide: React.FC<Props> = ({
   if (mediaDataUri && layout === 'full-bleed') {
     return (
       <AbsoluteFill>
-        <Background mediaDataUri={mediaDataUri} mediaType={mediaType} backgroundColor={backgroundColor} accentColor={accentColor} slideIndex={slideIndex} entryEffect={entryEffect} slideType="verse" photoShowcase />
+        <Background {...rest} mediaDataUri={mediaDataUri} mediaType={mediaType} backgroundColor={backgroundColor} accentColor={accentColor} slideIndex={slideIndex} entryEffect={entryEffect} slideType="verse" photoShowcase />
         <FullBleedOverlay heading={verse || heading} subheading={verseRef} accentColor={accentColor} />
         <ChurchBadge churchName={churchName} accentColor={accentColor} logoDataUri={logoDataUri} badge={badge} />
       </AbsoluteFill>
@@ -53,7 +54,7 @@ export const VerseSlide: React.FC<Props> = ({
   if (mediaDataUri && layout === 'immersive') {
     return (
       <AbsoluteFill>
-        <Background mediaDataUri={mediaDataUri} mediaType={mediaType} backgroundColor={backgroundColor} accentColor={accentColor} slideIndex={slideIndex} entryEffect={entryEffect} slideType="verse" photoShowcase />
+        <Background {...rest} mediaDataUri={mediaDataUri} mediaType={mediaType} backgroundColor={backgroundColor} accentColor={accentColor} slideIndex={slideIndex} entryEffect={entryEffect} slideType="verse" photoShowcase />
         <ImmersiveOverlay heading={heading} subheading={`"${verse}"${verseRef ? ' — ' + verseRef : ''}`} accentColor={accentColor} />
         <ChurchBadge churchName={churchName} accentColor={accentColor} logoDataUri={logoDataUri} badge={badge} />
       </AbsoluteFill>
@@ -72,7 +73,7 @@ export const VerseSlide: React.FC<Props> = ({
     const placement = layout === 'photo-card-side' ? 'side-right' : 'bottom';
     return (
       <AbsoluteFill>
-        <Background
+        <Background {...rest}
           mediaDataUri={mediaDataUri}
           mediaType={mediaType}
           backgroundColor={backgroundColor}
@@ -82,7 +83,7 @@ export const VerseSlide: React.FC<Props> = ({
         slideType="verse"
           photoShowcase
         />
-        <TextCard accentColor={accentColor} placement={placement as any} padding={40}>
+        <TextCard {...rest} accentColor={accentColor} placement={placement as any} padding={40}>
           <div
             style={{
               opacity: op,
@@ -146,7 +147,7 @@ export const VerseSlide: React.FC<Props> = ({
 
   return (
     <AbsoluteFill>
-      <Background
+      <Background {...rest}
         mediaDataUri={mediaDataUri}
         mediaType={mediaType}
         backgroundColor={backgroundColor}

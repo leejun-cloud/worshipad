@@ -187,6 +187,8 @@ const renderData = {
   accentColor: structure.accentColor,
   backgroundColor: structure.backgroundColor,
   logoDataUri: structure.logoDataUri,
+  stylePreset: structure.stylePreset,
+  bgOverlayOpacity: structure.bgOverlayOpacity,
   slides: structure.slides.map((slide, i) => ({
     type: slide.type,
     heading: slide.heading,

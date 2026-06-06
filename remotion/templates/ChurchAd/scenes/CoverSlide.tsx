@@ -32,6 +32,9 @@ export const CoverSlide: React.FC<Props> = ({
   entryEffect,
   badge,
   textScale,
+  motionIntensity,
+  bgOverlayOpacity,
+  ...rest
 }) => {
   const s = heroScale(textScale);
   const frame = useCurrentFrame();
@@ -47,7 +50,7 @@ export const CoverSlide: React.FC<Props> = ({
   if (mediaDataUri && layout === 'full-bleed') {
     return (
       <AbsoluteFill>
-        <Background mediaDataUri={mediaDataUri} mediaType={mediaType} backgroundColor={backgroundColor} accentColor={accentColor} slideIndex={slideIndex} entryEffect={entryEffect} slideType="cover" photoShowcase />
+        <Background {...rest} mediaDataUri={mediaDataUri} mediaType={mediaType} backgroundColor={backgroundColor} accentColor={accentColor} slideIndex={slideIndex} entryEffect={entryEffect} slideType="cover" photoShowcase motionIntensity={motionIntensity} bgOverlayOpacity={bgOverlayOpacity} />
         <FullBleedOverlay heading={title} subheading={subtitle} accentColor={accentColor} />
         <ChurchBadge churchName={churchName} accentColor={accentColor} logoDataUri={logoDataUri} badge={badge} />
       </AbsoluteFill>
@@ -56,7 +59,7 @@ export const CoverSlide: React.FC<Props> = ({
   if (mediaDataUri && layout === 'immersive') {
     return (
       <AbsoluteFill>
-        <Background mediaDataUri={mediaDataUri} mediaType={mediaType} backgroundColor={backgroundColor} accentColor={accentColor} slideIndex={slideIndex} entryEffect={entryEffect} slideType="cover" photoShowcase />
+        <Background {...rest} mediaDataUri={mediaDataUri} mediaType={mediaType} backgroundColor={backgroundColor} accentColor={accentColor} slideIndex={slideIndex} entryEffect={entryEffect} slideType="cover" photoShowcase motionIntensity={motionIntensity} bgOverlayOpacity={bgOverlayOpacity} />
         <ImmersiveOverlay heading={title} subheading={subtitle} accentColor={accentColor} />
         <ChurchBadge churchName={churchName} accentColor={accentColor} logoDataUri={logoDataUri} badge={badge} />
       </AbsoluteFill>
@@ -80,16 +83,19 @@ export const CoverSlide: React.FC<Props> = ({
     return (
       <AbsoluteFill>
         <Background
+          {...rest}
           mediaDataUri={mediaDataUri}
           mediaType={mediaType}
           backgroundColor={backgroundColor}
           accentColor={accentColor}
           slideIndex={slideIndex}
-        entryEffect={entryEffect}
-        slideType="cover"
+          entryEffect={entryEffect}
+          slideType="cover"
           photoShowcase
+          motionIntensity={motionIntensity}
+          bgOverlayOpacity={bgOverlayOpacity}
         />
-        <TextCard accentColor={accentColor} placement={placement as any}>
+        <TextCard {...rest} accentColor={accentColor} placement={placement as any}>
           <div
             style={{
               height: 4,
@@ -145,6 +151,7 @@ export const CoverSlide: React.FC<Props> = ({
   return (
     <AbsoluteFill>
       <Background
+        {...rest}
         mediaDataUri={mediaDataUri}
         mediaType={mediaType}
         backgroundColor={backgroundColor}
@@ -154,6 +161,8 @@ export const CoverSlide: React.FC<Props> = ({
         entryEffect={entryEffect}
         slideType="cover"
         scrim="bottom"
+        motionIntensity={motionIntensity}
+        bgOverlayOpacity={bgOverlayOpacity}
       />
       <AbsoluteFill
         style={{
